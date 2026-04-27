@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for dir in /srv/docker/*/
+for dir in "$DOCKER_DIR"*/
 do
         cd $dir
         docker compose down
