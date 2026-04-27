@@ -1,0 +1,23 @@
+#!/bin/bash
+
+BACKUP_DIR="/home/marthynas/srv-backups"
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+ARCHIVE_NAME="$BACKUP_DIR/$TIMESTAMP.tar.gz"
+RCLONE_CONFIG_PATH="/home/marthynas/.config/rclone/rclone.conf"
+RESTIC_PASSWORD_VALUE="Martynas@1217"
+
+sudo rsync -av --delete /home/marthynas/.local/share/Terraria/ /srv/terraria-files/
+
+echo "Shutting down docker containers"
+docker-shutdown
+
+echo "Creating backup..."
+sudo RCLONE_CONFIG="$RCLONE_CONFIG_PATH" RESTIC_PASSWORD="$RESTIC_PASSWORD_VALUE" \
+    restic -r rclone:Onedrive:/ServerBackups backup /srv/
+
+echo "Removing old backups..."
+sudo RCLONE_CONFIG="$RCLONE_CONFIG_PATH" RESTIC_PASSWORD="$RESTIC_PASSWORD_VALUE" \
+    restic -r rclone:Onedrive:/ServerBackups forget --keep-daily 14 --prune
+
+echo "Backup finished:)"
+docker-up

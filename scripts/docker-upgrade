@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for dir in /srv/docker/*/
+do
+        cd $dir
+        docker compose down
+        docker compose pull
+        docker compose up -d
+done
+
+cd
