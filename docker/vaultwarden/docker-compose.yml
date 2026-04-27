@@ -1,0 +1,28 @@
+services:
+  vaultwarden-server:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden-server
+    network_mode: service:vaultwarden-ts
+    restart: unless-stopped
+    depends_on:
+      - vaultwarden-ts
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+      WEBSOCKET_ENABLED: 'true'
+      SIGNUPS_ALLOWED: 'true'
+    volumes:
+      - ./data:/data
+
+  vaultwarden-ts:
+    image: ghcr.io/tailscale/tailscale:latest
+    container_name: vaultwarden-ts
+    hostname: vaultwarden.felis-lime.ts.net
+    restart: unless-stopped
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SERVE_CONFIG=/config/serve.json
+      - TS_USERNAME=true
+    volumes:
+      - /srv/docker/vaultwarden/ts-config:/config
+      - /srv/docker/vaultwarden/ts-state:/var/lib/tailscale

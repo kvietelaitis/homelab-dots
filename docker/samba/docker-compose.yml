@@ -1,0 +1,25 @@
+services:
+  samba-ts:
+    image: tailscale/tailscale:latest
+    container_name: samba-ts
+    hostname: samba
+    environment:
+      - TS_AUTHKEY=$(TS_AUTHKEY)
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+    volumes:
+      - /srv/docker/samba/ts-state:/var/lib/tailscale
+    restart: unless-stopped
+
+  samba:
+    image: dockurr/samba:4.22.6
+    container_name: samba
+    network_mode: service:samba-ts
+    environment:
+      NAME: $(NAME)
+      USER: $(USER)
+      PASS: $(PASS)
+    volumes:
+      - ./smb.conf:/etc/samba/smb.conf
+      - /home/marthynas/sambashare:/storage
+    restart: always

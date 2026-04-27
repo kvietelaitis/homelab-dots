@@ -1,0 +1,16 @@
+services:
+  retrom:
+    image: ghcr.io/jmberesford/retrom-service:latest
+    ports:
+      - 5101:5101
+    volumes:
+      - /home/marthynas/sambashare/personal/games:/app/library
+      - retrom-config:/app/config/
+      - retrom-data:/app/data/
+
+# anonymous volumes to persist data and config, or you can
+# optionally bind mount these to a specific path on your host
+# like done for the library directory above
+volumes:
+  retrom-data: # to persist data
+  retrom-config: # to persist config

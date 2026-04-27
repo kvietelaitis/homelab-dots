@@ -1,0 +1,32 @@
+services:
+  jellyfin-ts:
+    image: tailscale/tailscale:latest
+    container_name: jellyfin-ts
+    hostname: jellyfin
+    environment:
+      - TS_AUTHKEY=$(TS_AUTHKEY)
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SERVE_CONFIG=/config/jellyfin.json
+      - TS_USERSPACE=true 
+    volumes:
+     - /srv/docker/jellyfin/ts-config:/config
+     - /srv/docker/jellyfin/ts-state:/var/lib/tailscale
+    restart: unless-stopped
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    devices:
+      - /dev/dri:/dev/dri
+    network_mode: service:jellyfin-ts
+      #ports:
+      #- 8096:8096/tcp
+      #- 7359:7359/udp
+    volumes:
+      - /srv/docker/jellyfin/config:/config
+      - /srv/docker/jellyfin/cache:/cache
+      - type: bind
+        source: /home/marthynas/sambashare/personal/movies
+        target: /movies
+          #read_only: true
+    restart: 'unless-stopped'
